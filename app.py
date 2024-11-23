@@ -32,10 +32,11 @@ known_faces = {
 current_face_embedding = None
 
 def load_known_faces():
+    """Load registered faces and their embeddings from storage"""
     global known_faces
     if os.path.exists('public/id-names.csv'):
         df = pd.read_csv('public/id-names.csv')
-        # Load face embeddings from a file (you'll need to create this)
+        # Load face embeddings from a file (This file is the csv file that contains the embeddings)
         embeddings_file = 'public/face_embeddings.npy'
         if os.path.exists(embeddings_file):
             known_faces['embeddings'] = np.load(embeddings_file)
@@ -45,6 +46,7 @@ def load_known_faces():
     return pd.DataFrame(columns=['sequence', 'id', 'name'])
 
 def extract_face_embedding(frame, detection):
+    """Convert facial landmarks to a numerical embedding for comparison"""
     # Get facial landmarks as embedding
     landmarks = []
     for landmark in detection.location_data.relative_keypoints:
@@ -55,6 +57,8 @@ def extract_face_embedding(frame, detection):
     return landmarks
 
 def check_face(face_embedding):
+    """Compare detected face against known faces using KNN classification
+    Returns: dict with known_user status and name if recognized"""
     if face_embedding is None or not isinstance(known_faces['embeddings'], np.ndarray) or len(known_faces['embeddings']) == 0:
         return {'known_user': False, 'name': None}
     
@@ -78,6 +82,7 @@ def check_face(face_embedding):
         return {'known_user': False, 'name': None}
 
 def generate_frames():
+    """Stream webcam frames with face detection and recognition overlays"""
     camera = cv2.VideoCapture(0)
     global user_detected, current_face_embedding
     
@@ -139,16 +144,20 @@ def generate_frames():
 
 @app.route('/video_feed')
 def video_feed():
+    """Stream processed webcam feed to client"""
     return Response(generate_frames(),
                    mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @app.route('/user_status')
 def user_status():
+    """Return current user detection status"""
     global user_detected
     return jsonify({'user_detected': user_detected})
 
 @app.route('/register_user', methods=['POST'])
 def register_user():
+    """Register new user face embedding with associated name and ID
+    Expects JSON with 'id' and 'name' fields"""
     global known_faces, current_face_embedding
     try:
         data = request.get_json()
@@ -192,6 +201,7 @@ def register_user():
 
 @app.route('/check_user')
 def check_user():
+    """Check if current detected face matches any registered users"""
     global current_face_embedding
     return jsonify(check_face(current_face_embedding))
 

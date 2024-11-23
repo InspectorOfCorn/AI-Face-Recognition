@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from 'react';
 
+/**
+ * Main App component for face detection and user registration
+ * Handles real-time face detection, user recognition, and new user registration
+ */
 const App = () => {
+    // State management for user detection and recognition
     const [isUserDetected, setIsUserDetected] = useState(false);
     const [isKnownUser, setIsKnownUser] = useState(true);
     const [showRegistration, setShowRegistration] = useState(false);
@@ -8,16 +13,17 @@ const App = () => {
     const [recognizedName, setRecognizedName] = useState(null);
     const [error, setError] = useState(null);
 
+    // Poll backend for user detection and recognition status
     useEffect(() => {
         const interval = setInterval(async () => {
             try {
-                // Check user presence
+                // Check if any face is currently detected
                 const statusRes = await fetch('http://127.0.0.1:5000/user_status');
                 const statusData = await statusRes.json();
                 setIsUserDetected(statusData.user_detected);
                 setError(null);
 
-                // If user detected, check if known
+                // If face detected, check against registered users
                 if (statusData.user_detected) {
                     const checkRes = await fetch('http://127.0.0.1:5000/check_user');
                     const checkData = await checkRes.json();
@@ -41,9 +47,15 @@ const App = () => {
             }
         }, 1000);
 
+        // Cleanup interval on component unmount
         return () => clearInterval(interval);
     }, []);
 
+    /**
+     * Handle new user registration form submission
+     * Sends user data to backend for processing and storage
+     * @param {Event} e - Form submission event
+     */
     const handleRegistration = async (e) => {
         e.preventDefault();
         try {
@@ -69,6 +81,7 @@ const App = () => {
     return (
         <div className="App">
             <h1>Face Detection</h1>
+            {/* Camera feed display with error handling */}
             <div className="camera-widget">
                 <img
                     src="http://127.0.0.1:5000/video_feed"
@@ -84,6 +97,7 @@ const App = () => {
                         setError("Video feed unavailable");
                     }}
                 />
+                {/* Error and user name display */}
                 {error && <div className="error-message">Error: {error}</div>}
                 {recognizedName && (
                     <div className="name-tag">
@@ -91,10 +105,13 @@ const App = () => {
                     </div>
                 )}
             </div>
+
+            {/* User detection status */}
             <div className="status">
                 {isUserDetected ? <h2>User Detected</h2> : <h2>No User Detected</h2>}
             </div>
             
+            {/* Registration form for new users */}
             {showRegistration && (
                 <div className="registration-form">
                     <h3>New User Registration</h3>
