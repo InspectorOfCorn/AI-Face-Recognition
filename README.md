@@ -29,7 +29,6 @@ pip install -r requirements.txt
 ```bash
 python app.py
 ``` 
-4. Access the application through the React frontend.
 
 ## Frontend Setup
 
