@@ -1,4 +1,4 @@
-# Face Detection and Recognition App
+# Face Detection and Recognition Web App
 
 Combines a Flask backend for face detection/recognition with a React frontend interface.
 
@@ -13,12 +13,8 @@ Combines a Flask backend for face detection/recognition with a React frontend in
 
 ## Backend Setup
 
-1. Create and activate a Python virtual environment (recommended):
+1. Navigate to mediapipe-react-app
 
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows
-```
 2. Install the required packages:
 
 ```bash
@@ -32,11 +28,8 @@ python app.py
 
 ## Frontend Setup
 
-1. Navigate to the `frontend` directory:
+Stay in the mediapipe-react-app directory
 
-```bash
-cd frontend
-```
 2. Install the required packages:
 
 ```bash
